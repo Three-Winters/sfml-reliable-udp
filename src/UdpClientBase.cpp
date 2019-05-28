@@ -11,10 +11,14 @@ void UdpClientBase::process(sf::Packet p, sf::IpAddress sender, unsigned short p
   
   switch(mode) {
 	  case Netcodes::SYN_ACK:
-		associate(p, sender);
+		if(pending) {
+		  associate(p, sender);
+		  std::cout<<"got ack\n";
+		}
 		break;
 	  default:
 		std::cout<<"unhandled code: "<<mode<<std::endl;
+		break;
   }	
 }
 
@@ -35,10 +39,10 @@ void UdpClientBase::poll() {
   }
   if(!pending) {
 	sf::Packet seq_p;
-	seq_p << 10;
+	seq_p << (sf::Uint8)10;
 	seq_p << seq;
 	
-	//socket.send(seq_p, sf::IpAddress::LocalHost, CONN_PORT);
+	socket.send(seq_p, sf::IpAddress::LocalHost, CONN_PORT);
 	seq++;
 	//seq_num += 4;
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -79,9 +83,11 @@ void UdpClientBase::associate(sf::Packet p, sf::IpAddress server) {
   sf::Uint8 code = Netcodes::SYN_ACK;
   connect2 << code << key;
   socket.unbind();
+  
   if(connect(server, port)) {
-	pending = false;
+	
 	socket.send(connect2, server, CONN_PORT);
+	pending = false;
   }
 }
 
