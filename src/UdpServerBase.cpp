@@ -50,6 +50,7 @@ UdpServerBase::UdpServerBase() {
 	std::cout << "Failed to bind server to port " << bind_port << std::endl;
 	abort();
   }
+  socket.setBlocking(false);
   connections.reserve(max_connections);
 }
 UdpServerBase::~UdpServerBase() {}
@@ -62,7 +63,7 @@ void UdpServerBase::poll() {
   unsigned short port;
   get_pings();
   
-  socket.setBlocking(false);
+  std::this_thread::sleep_for(std::chrono::milliseconds(poll_rate));
   sf::Socket::Status status = socket.receive(packet, sender, port);
   if(status == sf::Socket::Status::Done) {
 	mode_sort(packet, sender, port);

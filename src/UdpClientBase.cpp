@@ -45,7 +45,7 @@ void UdpClientBase::poll() {
 	socket.send(seq_p, sf::IpAddress::LocalHost, CONN_PORT);
 	seq++;
 	//seq_num += 4;
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	std::this_thread::sleep_for(std::chrono::milliseconds(poll_rate));
   }
 }
 

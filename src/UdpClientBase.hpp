@@ -15,6 +15,7 @@ public:
 
   const unsigned short int CONN_PORT = 54001;
   const uint16_t FITH = 0x3333;
+  uint32_t poll_rate = 10;
   
   unsigned short int port = 54000;
   sf::Uint16 seq = 0;

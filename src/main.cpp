@@ -1,8 +1,25 @@
 #include <iostream>
 #include <cstring>
 #include <SFML/Network.hpp>
+#include <thread>
+#include <mutex>
 #include "UdpServerBase.hpp"
 #include "UdpClientBase.hpp"
+
+std::mutex m;
+char c;
+std::string str;
+
+void console() {
+  m.lock();
+  std::cin >> str;
+  m.unlock();
+}
+
+std::thread make_input_thread() {
+  std::thread input_thread (console);
+  return(input_thread);
+}
 
 int main(int argc, char** argv) {
   /*
@@ -43,15 +60,39 @@ int main(int argc, char** argv) {
 							 }
 						   };
 	my_serv->process = pl;
+
+	make_input_thread().detach();
   
 	while(true) {
-	  my_serv->poll();
+	  //my_serv->poll();
+	  std::thread poll_thread (&UdpServerBase::poll, my_serv);
+
+	  if (str != "") {
+		m.lock();
+		std::cout << "You typed: " << str << std::endl;
+		str = "";
+		m.unlock();
+		make_input_thread().detach();
+	  }
+	  poll_thread.join();
 	}
   } else {
 	UdpClientBase* my_client = new UdpClientBase();
 	my_client->connect(sf::IpAddress::LocalHost, 54000);
+	
+	make_input_thread().detach();
+	
 	while(true) {
-	  my_client->poll();
+	  std::thread poll_thread (&UdpClientBase::poll, my_client);
+
+	  if (str != "") {
+		m.lock();
+		std::cout << "You typed: " << str << std::endl;
+		str = "";
+		m.unlock();
+		make_input_thread().detach();
+	  }
+	  poll_thread.join();
 	}
   }
   return(0);

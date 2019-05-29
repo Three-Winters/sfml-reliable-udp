@@ -6,6 +6,8 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <chrono>
+#include <thread>
 
 #include "Connection.hpp"
 
@@ -21,6 +23,7 @@ public:
   const uint16_t FITH = 0x3333; //A fith of the max value of uint16_t
   unsigned long int max_connections = 24;
   int32_t PING_TIMEOUT = 65536;
+  uint32_t poll_rate = 0;
   uint8_t max_con_connections = 8;
   ProcessPacketsFun process = NULL;
 
